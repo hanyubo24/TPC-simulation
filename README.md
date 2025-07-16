@@ -2,7 +2,7 @@ TPC simulation package:
 
 including two parts:
 
-      1. simulation of energy deposit in TPC region   
+      1. (online): simulation of energy deposition in TPC region   
       2. (offline): digitilization of the signal accoridng to the config of the readout silicon sensors:
          to-do: a python package to read in the simulation output and readout config file
          output: hitmap, with time info
