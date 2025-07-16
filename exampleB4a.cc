@@ -40,7 +40,7 @@
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
 #include "G4DigiManager.hh"
-#include "SiliconDigitizer.hh"
+#include "TPCDigitizer.hh"
 // #include "Randomize.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 
   runManager-> Initialize();
   auto digimgr = G4DigiManager::GetDMpointer();
-  auto* digiModule = new SiliconDigitizer("SiliconDigitizer");
+  auto* digiModule = new TPCDigitizer("TPCDigitizer");
   digimgr->AddNewModule(digiModule);
  
   //G4EmParameters::Instance()->SetStepFunction(0.1, 0.5 * um);

@@ -28,7 +28,7 @@
 /// \brief Implementation of the B4::DetectorConstruction class
 
 #include "DetectorConstruction.hh"
-#include "SiliconSensitiveDetector.hh"
+#include "TPCSensitiveDetector.hh"
 #include "G4AutoDelete.hh"
 #include "G4Box.hh"
 #include "G4Tubs.hh"
@@ -69,7 +69,7 @@ void DetectorConstruction::DefineMaterials()
 {
   // Lead material defined using NIST Manager
   auto nist = G4NistManager::Instance();
-  nist->FindOrBuildMaterial("G4_Si");
+  // nist->FindOrBuildMaterial("G4_Si");
   nist->FindOrBuildMaterial("G4_AIR");
   nist->FindOrBuildMaterial("G4_Galactic");
   auto Ar  = nist->FindOrBuildElement("Ar"); 
@@ -100,7 +100,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto worldSizeXY =5 *m;
   auto worldSizeZ = 5 *m;
 
-  auto siliconMaterial = G4Material::GetMaterial("G4_Si");
+  // auto siliconMaterial = G4Material::GetMaterial("G4_Si");
   auto air = G4Material::GetMaterial("G4_AIR");
   auto vacuum = G4Material::GetMaterial("G4_Galactic");
   auto tpcGas = G4Material::GetMaterial("TPCGas");
@@ -124,23 +124,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                                    0,  // copy number
                                    fCheckOverlaps);  // checking overlaps
 
-  
-  // Silicon
-/*
- //  a simple layer 
-  auto solidSensor = new G4Box("Silicon", 400*pitch/2, 100*pitch/2, thickness/2);
-  auto siliconSensorLV = new G4LogicalVolume(solidSensor, siliconMaterial, "Silicon");
 
-  fSiliconLogic = siliconSensorLV; 
-  siliconSensorPV = new G4PVPlacement(0, G4ThreeVector(0,0,thickness/2), siliconSensorLV, "Silicon", worldLV, false, 0, fCheckOverlaps);
-
- // second layer
- // auto solidSensor_1 = new G4Box("Silicon_1", 400*pitch/2, 100*pitch/2, thickness/2);
- // auto siliconSensorLV_1 = new G4LogicalVolume(solidSensor_1, siliconMaterial, "Silicon_1");
-
- // fSiliconLogic_1 = siliconSensorLV_1; 
- // siliconSensorPV_1 = new G4PVPlacement(0, G4ThreeVector(0,0,10*cm), siliconSensorLV_1, "Silicon_1", worldLV, false, 0, fCheckOverlaps);
-*/
  // a cylinder 
   G4double radius_for_testing = 20*cm;
   G4double size_z = 20*cm;
@@ -177,9 +161,9 @@ void DetectorConstruction::ConstructSDandField()
   G4AutoDelete::Register(fMagFieldMessenger);
 
   G4SDManager* sdManager = G4SDManager::GetSDMpointer();
-  auto* siliconSD = new SiliconSensitiveDetector("SiliconSD");
-  sdManager->AddNewDetector(siliconSD);
-  fTPCLogic->SetSensitiveDetector(siliconSD);
+  auto* TPCSD = new TPCSensitiveDetector("TPCSD");
+  sdManager->AddNewDetector(TPCSD);
+  fTPCLogic->SetSensitiveDetector(TPCSD);
 
   auto regionTPC = new G4Region("TPCRegion");
   fTPCLogic->SetRegion(regionTPC);
@@ -191,7 +175,7 @@ void DetectorConstruction::ConstructSDandField()
   cuts->SetProductionCut(0.1*micrometer, "gamma");
   
   regionTPC->SetProductionCuts(cuts);
- // fSiliconLogic_1->SetSensitiveDetector(siliconSD);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

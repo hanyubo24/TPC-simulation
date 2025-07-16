@@ -34,7 +34,7 @@
 #include "RunAction.hh"
 #include "SteppingAction.hh"
 #include "G4DigiManager.hh"
-#include "SiliconDigitizer.hh"
+#include "TPCDigitizer.hh"
 
 using namespace B4;
 
@@ -87,7 +87,7 @@ void ActionInitialization::Build() const
   SetUserAction(new SteppingAction(fDetConstruction, eventAction));
 
   auto* digiManager = G4DigiManager::GetDMpointer();
-  auto* digitizer = new SiliconDigitizer("SiliconDigitizer");
+  auto* digitizer = new TPCDigitizer("TPCDigitizer");
   digiManager->AddNewModule(digitizer);
 }
 

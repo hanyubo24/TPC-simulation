@@ -51,19 +51,6 @@ RunAction::RunAction(const G4String& outFileName)
   // set printing event number per each event
   G4RunManager::GetRunManager()->SetPrintProgress(1);
 
-
-  // Create analysis manager
-  // The choice of the output format is done via the specified
-  // file extension.
- // auto analysisManager = G4AnalysisManager::Instance();
-
-  // Create directories
-  // analysisManager->SetHistoDirectoryName("histograms");
-  // analysisManager->SetNtupleDirectoryName("ntuple");
-  //analysisManager->SetVerboseLevel(1);
-  //analysisManager->SetNtupleMerging(true);
-  // Note: merging ntuples is available only with Root output
-
   // Book histograms, ntuple
     auto* analysisManager = G4AnalysisManager::Instance();
     //analysisManager->SetVerboseLevel(1);
@@ -129,19 +116,6 @@ RunAction::RunAction(const G4String& outFileName)
     analysisManager->CreateNtupleDColumn("betagamma");
     analysisManager->FinishNtuple();
   //
-  // Creating histograms
-  //analysisManager->CreateH1("Eabs", "Edep in absorber", 110, 0., 30 * MeV);
-  //analysisManager->CreateH1("nCharge", "Number of Charges in one event", 100, 0., 100);
-  //analysisManager->CreateH1("TimeHits", "Time of the hit", 100, 0., 100);
-
-  // Creating ntuple
-  //
-  //analysisManager->CreateNtuple("Silicon", "Edep");
-  //analysisManager->CreateNtupleDColumn("Eabs");
-  //analysisManager->CreateNtupleDColumn("nCharge");
-  //analysisManager->CreateNtupleDColumn("TimeHits");
-  //analysisManager->CreateNtupleDColumn("Waveform");
-  //analysisManager->FinishNtuple();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -158,7 +132,6 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/)
      
     analysisManager->OpenFile(fOutFileName);  // 
 
-    //
  
 }
 

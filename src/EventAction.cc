@@ -34,10 +34,10 @@
 #include "G4RunManager.hh"
 #include "G4DigiManager.hh"
 #include "G4UnitsTable.hh"
-#include "SiliconDigitizer.hh"
-#include "SiliconDigi.hh"
+#include "TPCDigitizer.hh"
+#include "TPCDigi.hh"
 #include "G4SDManager.hh"
-#include "SiliconHit.hh" 
+#include "TPCHit.hh" 
 #include <iomanip>
 
 namespace B4a
@@ -59,36 +59,15 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 void EventAction::EndOfEventAction(const G4Event* event)
 {
   if (hitColID == -1) {
-  hitColID= G4SDManager::GetSDMpointer()->GetCollectionID("SiliconSD/SiliconHitsCollection");  
+  hitColID= G4SDManager::GetSDMpointer()->GetCollectionID("TPCSD/TPCHitsCollection");  
 }
-  auto hitsCol = static_cast<const SiliconHitsCollection*>(event->GetHCofThisEvent()->GetHC(hitColID));
+  auto hitsCol = static_cast<const TPCHitsCollection*>(event->GetHCofThisEvent()->GetHC(hitColID));
  // std::cout<< "YB testing end of Events "<< hitsCol->entries() <<std::endl;
   
   G4DigiManager* digiManager = G4DigiManager::GetDMpointer();
-  digiManager->Digitize("SiliconDigitizer");
+  digiManager->Digitize("TPCDigitizer");
   
   
-
-  //G4int dcID = digiManager->GetDigiCollectionID("SiliconDigitizer/SiliconDigiCollection");
-  //auto* digits = const_cast<SiliconDigiCollection*>(static_cast<const SiliconDigiCollection*>(digiManager->GetDigiCollection(dcID)));
-
-////  const auto* digits = static_cast<SiliconDigiCollection*>(digiManager->GetDigiCollection(dcID));;
-
-  //if (!digits || digits->entries() == 0) return;
-
-  //auto* digit = (*digits)[0];
-  //const std::vector<double>& waveform = digit->GetWaveform();
-  //auto ChargedHits = digit->GetCharge(); 
-  //auto TimeHits = digit->GetTime(); 
-
-  // Print per event (modulo n)
-  //
-  //auto eventID = event->GetEventID();
-  //auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
-  //if ((printModulo > 0) && (eventID % printModulo == 0)) {
-  //  G4cout << "   Absorber: total energy: " << std::setw(7) << G4BestUnit(fEnergyAbs, "Energy") << G4endl;
-  //  G4cout << "--> End of event " << eventID << "\n" << G4endl;
- // }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....

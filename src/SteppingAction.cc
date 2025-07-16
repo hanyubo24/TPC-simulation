@@ -31,7 +31,7 @@
 #include "G4SDManager.hh"
 #include "DetectorConstruction.hh"
 #include "EventAction.hh"
-#include "SiliconHit.hh"
+#include "TPCHit.hh"
 #include "G4Step.hh"
 #include "globals.hh"
 #include "G4EventManager.hh"
@@ -128,19 +128,19 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       static G4int hcID = -1;
       
       if (hcID < 0) {
-          hcID = G4SDManager::GetSDMpointer()->GetCollectionID("SiliconSD/SiliconHitsCollection");
+          hcID = G4SDManager::GetSDMpointer()->GetCollectionID("TPCSD/TPCHitsCollection");
       }
       if (hcID < 0) {
-        G4cerr << "[FATAL] SiliconHitsCollection not registered yet!" << G4endl;
+        G4cerr << "[FATAL] TPCHitsCollection not registered yet!" << G4endl;
         return;
       }
 
       G4HCofThisEvent* hce = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetHCofThisEvent();
       if (!hce) return;
-      auto* hitCollection = static_cast<SiliconHitsCollection*>(hce->GetHC(hcID));
+      auto* hitCollection = static_cast<TPCHitsCollection*>(hce->GetHC(hcID));
       if (!hitCollection){
         // First time: create and add it manually
-        hitCollection = new SiliconHitsCollection("SiliconSD", "SiliconHitsCollection");
+        hitCollection = new TPCHitsCollection("TPCSD", "TPCHitsCollection");
         hce->AddHitsCollection(hcID, hitCollection);
 
         }
@@ -149,7 +149,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
         fEventAction->AddAbs(edep);
           // Create and fill hit
-          auto* hit = new SiliconHit();
+          auto* hit = new TPCHit();
           hit->SetEdep(edep);
           hit->SetPos(pos);
           hit->SetVertex(vertex);
