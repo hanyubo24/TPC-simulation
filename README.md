@@ -10,7 +10,7 @@ including two parts:
 
 usage:
       
-      1. clone the repository 
+      1. (clone the repository)
       2. mkdir build 
       3. cd build 
       4. cmake ..
