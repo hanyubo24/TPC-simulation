@@ -50,10 +50,10 @@ namespace
 void PrintUsage()
 {
   G4cerr << " Usage: " << G4endl;
-  G4cerr << " exampleB4a [-m macro ] [-u UIsession] [-t nThreads] [-vDefault]" << G4endl;
-  G4cerr << " exampleB4a -p e- -pmin 80 -pmax 80 -o myOutput.root -z -14.0" << G4endl;
-  G4cerr << " exampleB4a -csv xxx.csv -o myOutput.root -z -14.0" << G4endl;
-  G4cerr << " -ui: turnning on the ui" << G4endl;
+  G4cerr << " ./TPC [-m macro ] [-u UIsession] [-t nThreads] [-vDefault]" << G4endl;
+  G4cerr << "        -p e- -pmin 80 -pmax 80 -o myOutput.root -z -14.0" << G4endl;
+  G4cerr << "        -csv xxx.csv -o myOutput.root -z -14.0" << G4endl;
+  G4cerr << "        -ui: turnning on the ui" << G4endl;
 }
 }  // namespace
 
