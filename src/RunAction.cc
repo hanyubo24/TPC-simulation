@@ -62,14 +62,14 @@ RunAction::RunAction(const G4String& outFileName)
         title << "HitMap for slice #" << i << ";X (mm);Y (mm)";
 
         analysisManager->CreateH2(name.str(), title.str(), 
-                                  bins_x, -1000., 1000.,   // X binning
-                                  bins_y, -1000.,  1000.);   // Y binning
+                                  bins_x, -500., 500.,   // X binning
+                                  bins_y, -500.,  500.);   // Y binning
     }
 
     //analysisManager->SetVerboseLevel(1);
     //analysisManager->SetNtupleMerging(true);
     // index = 10
-    analysisManager->CreateH2("HitMap_all", "HitMap;X (mm);Y (mm)", bins_x, -1000., 1000.,bins_y, -1000., 1000.);
+    analysisManager->CreateH2("HitMap_all", "HitMap;X (mm);Y (mm)", bins_x, -500., 500.,bins_y, -500., 500.);
     // analysisManager->CreateH2("Dedx_hit", "Dedx per hit:P;Dedx", 500,0,3,500,0,20);
     // analysisManager->CreateH2("Dedx_event", "Dedx per event;P;Dedx ", 500,0,3,500,0,20);
     // analysisManager->CreateH2("Dedx_hit_gb", "Dedx per hit;[betaGamma];Dedx ", 500,0,10,500,0,20);
@@ -83,7 +83,7 @@ RunAction::RunAction(const G4String& outFileName)
     analysisManager->CreateNtupleDColumn("TotalLength");
     analysisManager->CreateNtupleDColumn("Dedx");
     analysisManager->CreateNtupleDColumn("MomIn");
-    // analysisManager->CreateNtupleDColumn("betagamma");
+    
     analysisManager->FinishNtuple();
   //
     if (hitNtuple){

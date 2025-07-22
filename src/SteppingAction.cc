@@ -56,23 +56,20 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
   // get volume of the current step
   //auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
-  auto volume = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
-  auto volume_pre = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
+  // auto volume_pre = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
   G4Track* track = step->GetTrack();
   auto cPoint = step->GetPostStepPoint();
   auto pPoint = step->GetPreStepPoint();
-  G4ThreeVector preStepPos = pPoint->GetPosition();
 
   G4String preName = "";
-  if (cPoint && cPoint->GetPhysicalVolume()) {
-      preName = cPoint->GetPhysicalVolume()->GetName();
+  if (pPoint && pPoint->GetPhysicalVolume()) {
+      preName = pPoint->GetPhysicalVolume()->GetName();
   }
-
-  // if (volume == fDetConstruction->GetTPCPV()) {
-    if (preName == "TPCSlicePhys") {
+  if (preName == "TPCSlicePhys") {
 
       // printing out something 
       G4ThreeVector postStepPos = cPoint->GetPosition();
+      G4ThreeVector preStepPos = pPoint->GetPosition();
 
       //if (postStepPos.mag() < 1e-6) return;
       if (step->GetStepLength() == 0) return;  // skip pure Transportation
@@ -80,6 +77,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
       const G4VProcess* process = step->GetPostStepPoint()->GetProcessDefinedStep();
       G4String processName = "notAssigned";
+
       if (process) {
           processName = process->GetProcessName();
           G4String particleName = track->GetDefinition()->GetParticleName();
@@ -97,7 +95,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       if (stepLength <= 0) return;
 
       auto vertex = track->GetVertexPosition();
-      auto pos = cPoint->GetPosition(); // global position
+      auto pos = postStepPos; // global position
 
       // get actual drift length on z
       G4TouchableHandle touchable = cPoint->GetTouchableHandle();
@@ -110,19 +108,12 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       // 4. Distance to +Z or -Z surface
       distanceToZsurface = std::min(halfZ - zLocal, halfZ + zLocal);
 
-      
-      int hit_layer = touchable->GetReplicaNumber();
-      //int hit_layer = pos.z()>1*cm ? 1:0;
-      //auto pathLength = (pos-vertex).mag();
-      auto pathLength = track-> GetTrackLength();
 
+      int hit_layer = touchable->GetReplicaNumber();
+      auto pathLength = track-> GetTrackLength();
       auto time = cPoint->GetGlobalTime();
-      //auto momentum = pPoint->GetMomentum();
-      //auto pMag = momentum.mag();
       auto momentum=track->GetMomentum();
       auto pMag = momentum.mag();
-     
-
       auto dedx = edep / stepLength;
  
       static G4int hcID = -1;
@@ -144,36 +135,35 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         hce->AddHitsCollection(hcID, hitCollection);
 
         }
-       //G4cout << "[Debug] HC ID: " << hcID << ", collection pointer: " << hitCollection << G4endl;
-       //G4cout << "[Debug] Entries BEFORE insert: " << hitCollection->entries() << G4endl;
+ 
 
-        fEventAction->AddAbs(edep);
-          // Create and fill hit
-          auto* hit = new TPCHit();
-          hit->SetEdep(edep);
-          hit->SetPos(pos);
-          hit->SetVertex(vertex);
-          hit->SetPreStepPos(preStepPos);
-          hit->SetPostStepPos(postStepPos);
-          hit->SetPathLength(pathLength);
-          hit->SetProcessName(processName);
-          G4int eventID = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
-          
-          hit->SetEventID(eventID);
-          hit->SetTime(time);
-          hit->SetStepLength(stepLength);
-          hit->SetDedx(dedx);
-          hit->SetMomIn(pMag);
-          
-          hit->SetPt(momentum.perp());
-          hit->SetPz(momentum.z());
-          hit->SetParticleMass(mass);
-          hit->SetActualDriftz(distanceToZsurface);
+      fEventAction->AddAbs(edep);
+      // Create and fill hit
+      auto* hit = new TPCHit();
+      hit->SetEdep(edep);
+      hit->SetPos(pos);
+      hit->SetVertex(vertex);
+      hit->SetPreStepPos(preStepPos);
+      hit->SetPostStepPos(postStepPos);
+      hit->SetPathLength(pathLength);
+      hit->SetProcessName(processName);
+      G4int eventID = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
+      
+      hit->SetEventID(eventID);
+      hit->SetTime(time);
+      hit->SetStepLength(stepLength);
+      hit->SetDedx(dedx);
+      hit->SetMomIn(pMag);
+      
+      hit->SetPt(momentum.perp());
+      hit->SetPz(momentum.z());
+      hit->SetParticleMass(mass);
+      hit->SetActualDriftz(distanceToZsurface);
 
-          hit->SetHitLayer(hit_layer);
-          hitCollection->insert(hit);
-         // G4debug<<" filling hitCollection ...."<<G4endl;
-         // G4cout << "[Debug] Entries AFTER insert: " << hitCollection->entries() << G4endl;
+      hit->SetHitLayer(hit_layer);
+      hitCollection->insert(hit);
+     // G4debug<<" filling hitCollection ...."<<G4endl;
+     // G4cout << "[Debug] Entries AFTER insert: " << hitCollection->entries() << G4endl;
   }
 
 }

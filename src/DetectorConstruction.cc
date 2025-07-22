@@ -91,14 +91,9 @@ void DetectorConstruction::DefineMaterials()
 G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 {
   
-  G4double pitch = 100 * micrometer;
-  G4double thickness = 200 * micrometer;
-  //G4double thickness = 2*cm;
-  //auto worldSizeXY = 50* pitch;
-  //auto worldSizeZ = worldSizeXY*10;
-  //auto worldSizeXY = 500* pitch;
-  auto worldSizeXY =5 *m;
-  auto worldSizeZ = 5 *m;
+
+  auto worldSizeXY =3 *m;
+  auto worldSizeZ = 3 *m;
 
   // auto siliconMaterial = G4Material::GetMaterial("G4_Si");
   auto air = G4Material::GetMaterial("G4_AIR");
@@ -126,11 +121,24 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
 
  // a cylinder 
-  G4double radius_for_testing = 20*cm;
-  G4double size_z = 20*cm;
+  G4double radius_for_testing = 0.5*m;
+  G4double size_z = 0.5*m; // full z = *2
+  G4int numSlices = 10; // 
+  G4double sliceZHalf = size_z / numSlices;
+
+  // 1. Full TPC volume (mother)
 
   auto gasDet = new G4Tubs("TPC", 0, radius_for_testing, size_z, 0.0*deg, 360.0*deg);
-  auto gasLV = new G4LogicalVolume(gasDet, tpcGas, "TPC");    
+  auto gasLV = new G4LogicalVolume(gasDet, tpcGas, "TPC");  
+
+  // 2. Slice volume (1/N of TPC in Z)
+  auto sliceGas = new G4Tubs("TPCSlice", 0, radius_for_testing, sliceZHalf, 0.0*deg, 360.0*deg);
+  fsliceLV = new G4LogicalVolume(sliceGas, tpcGas, "TPCSlice"); 
+
+  // 3. Replicate slices along Z
+  new G4PVReplica("TPCSlicePhys", fsliceLV, gasLV, kZAxis, numSlices, 2*sliceZHalf);
+
+  // 4. Place full TPC in the world
   fTPCLogic = gasLV; 
   TPCPV = new G4PVPlacement(0, G4ThreeVector(0,0,0), gasLV, "TPC", worldLV, false, 0, fCheckOverlaps);
 

@@ -63,10 +63,6 @@ ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction
 
 void ActionInitialization::BuildForMaster() const
 {
- // auto* analysisManager = G4AnalysisManager::Instance();
- //   analysisManager->SetVerboseLevel(1);
- //   analysisManager->SetNtupleMerging(true);
- //   analysisManager->OpenFile("Silicon.root");  
   SetUserAction(new RunAction(foutFileName));
   
 }
