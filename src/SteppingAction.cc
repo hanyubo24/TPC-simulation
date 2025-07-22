@@ -59,12 +59,17 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   auto volume = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
   auto volume_pre = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
   G4Track* track = step->GetTrack();
-  G4StepPoint* cPoint = step->GetPostStepPoint();
-  G4StepPoint* pPoint = step->GetPreStepPoint();
+  auto cPoint = step->GetPostStepPoint();
+  auto pPoint = step->GetPreStepPoint();
   G4ThreeVector preStepPos = pPoint->GetPosition();
-  //if (preStepPos == G4ThreeVector(0., 0., 0.)) {
 
-  if (volume == fDetConstruction->GetTPCPV()) {
+  G4String preName = "";
+  if (cPoint && cPoint->GetPhysicalVolume()) {
+      preName = cPoint->GetPhysicalVolume()->GetName();
+  }
+
+  // if (volume == fDetConstruction->GetTPCPV()) {
+    if (preName == "TPCSlicePhys") {
 
       // printing out something 
       G4ThreeVector postStepPos = cPoint->GetPosition();
@@ -77,13 +82,9 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       G4String processName = "notAssigned";
       if (process) {
           processName = process->GetProcessName();
-        //  G4cout << "YB: testing Process: " << process->GetProcessName() << G4endl;
           G4String particleName = track->GetDefinition()->GetParticleName();
           G4ThreeVector momentumDir = track->GetMomentumDirection();
-        //  G4cout << "YB: testingwith incomming from : " << particleName << G4endl;
-        //  G4cout << "YB: testing   pre              at : " << preStepPos.x() / mm << ", "<<preStepPos.y() / mm <<", "<< preStepPos.z() / mm   <<" ) mm"<< G4endl;
-        //  G4cout << "YB: testing   post              at : " << postStepPos.x() / mm << ", "<<postStepPos.y() / mm <<", "<< postStepPos.z() / mm   <<" ) mm"<< G4endl;
-
+        
       }
       // energy deposit
       auto edep = step->GetTotalEnergyDeposit();
@@ -104,14 +105,13 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       G4ThreeVector localPos = touchable->GetHistory()->GetTopTransform().TransformPoint(pos); // change it to local position
 
       G4double distanceToZsurface;
-          G4double halfZ = 100*um;
-          G4double zLocal = localPos.z();  // current z position in local coordinates
-          // 4. Distance to +Z or -Z surface
-          distanceToZsurface = std::min(halfZ - zLocal, halfZ + zLocal);
-      
-         // G4cout << "Distance to Z surface: " << distanceToZsurface / mm << " mm" << G4endl;
+      G4double halfZ = 100*um;
+      G4double zLocal = localPos.z();  // current z position in local coordinates
+      // 4. Distance to +Z or -Z surface
+      distanceToZsurface = std::min(halfZ - zLocal, halfZ + zLocal);
 
-      int hit_layer = (volume == fDetConstruction->GetTPCPV()) ? 0 : 1;
+      
+      int hit_layer = touchable->GetReplicaNumber();
       //int hit_layer = pos.z()>1*cm ? 1:0;
       //auto pathLength = (pos-vertex).mag();
       auto pathLength = track-> GetTrackLength();

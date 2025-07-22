@@ -49,72 +49,89 @@ RunAction::RunAction(const G4String& outFileName)
 : fOutFileName(outFileName)
 {
   // set printing event number per each event
-  G4RunManager::GetRunManager()->SetPrintProgress(1);
-
-  // Book histograms, ntuple
+    G4RunManager::GetRunManager()->SetPrintProgress(1);
     auto* analysisManager = G4AnalysisManager::Instance();
+
+    G4int numSlices = 10;
+    G4int bins_x = 100;
+    G4int bins_y = 100;
+    G4bool hitNtuple = false;
+    for (G4int i = 0; i < numSlices; ++i) {
+        std::ostringstream name, title;
+        name  << "HitMap_layer_" << i;
+        title << "HitMap for slice #" << i << ";X (mm);Y (mm)";
+
+        analysisManager->CreateH2(name.str(), title.str(), 
+                                  bins_x, -1000., 1000.,   // X binning
+                                  bins_y, -1000.,  1000.);   // Y binning
+    }
+
     //analysisManager->SetVerboseLevel(1);
     //analysisManager->SetNtupleMerging(true);
-
-    analysisManager->CreateH2("HitMap_layer0", "HitMap;PixID X;PixID Y", 400, -200,200, 100,-50, 50 );
-    analysisManager->CreateH2("Dedx_hit", "Dedx per hit:P;Dedx", 500,0,3,500,0,20);
-    analysisManager->CreateH2("Dedx_event", "Dedx per event;P;Dedx ", 500,0,3,500,0,20);
-    analysisManager->CreateH2("Dedx_hit_gb", "Dedx per hit;[betaGamma];Dedx ", 500,0,10,500,0,20);
-    analysisManager->CreateH2("Dedx_event_bg", "Dedx per event;[betaGamma];Dedx ", 500,0,10,500,0,20);
-    analysisManager->CreateH2("HitMap_layer1", "HitMap;PixID X;PixID Y", 400, -200,200, 100,-50, 50 );
+    // index = 10
+    analysisManager->CreateH2("HitMap_all", "HitMap;X (mm);Y (mm)", bins_x, -1000., 1000.,bins_y, -1000., 1000.);
+    // analysisManager->CreateH2("Dedx_hit", "Dedx per hit:P;Dedx", 500,0,3,500,0,20);
+    // analysisManager->CreateH2("Dedx_event", "Dedx per event;P;Dedx ", 500,0,3,500,0,20);
+    // analysisManager->CreateH2("Dedx_hit_gb", "Dedx per hit;[betaGamma];Dedx ", 500,0,10,500,0,20);
+    // analysisManager->CreateH2("Dedx_event_bg", "Dedx per event;[betaGamma];Dedx ", 500,0,10,500,0,20);
+    // analysisManager->CreateH2("HitMap_layer1", "HitMap;PixID X;PixID Y", 400, -200,200, 100,-50, 50 );
 
     G4cout << "[THREAD] Creating ntuple..." << G4endl;
-    analysisManager->CreateNtuple("HitNtuple", "Digitized Signals");
-    analysisManager->CreateNtupleDColumn("charge"); 
-    analysisManager->CreateNtupleDColumn("driftTime_notSmeared"); // drift to the surface of the silicon
-    analysisManager->CreateNtupleDColumn("driftTime_Smeared"); 
-    analysisManager->CreateNtupleDColumn("PixIDX");
-    analysisManager->CreateNtupleDColumn("PixIDY");
-    analysisManager->CreateNtupleDColumn("EnergyDep");
-    analysisManager->CreateNtupleDColumn("StepLength"); 
-    analysisManager->CreateNtupleDColumn("Dedx");
-    analysisManager->CreateNtupleDColumn("MomIn");
-    analysisManager->CreateNtupleDColumn("MassIn");
-    analysisManager->CreateNtupleDColumn("betagamma");
-    analysisManager->CreateNtupleDColumn("layer");
-    analysisManager->CreateNtupleDColumn("Gtime"); // global time
-    analysisManager->CreateNtupleDColumn("Gtime_smeared"); // Gtime + driftTime_Smeared
-    analysisManager->CreateNtupleDColumn("P_e");
-    analysisManager->CreateNtupleDColumn("P_mu");
-    analysisManager->CreateNtupleDColumn("P_pi");
-    analysisManager->CreateNtupleDColumn("P_kaon");
-    analysisManager->CreateNtupleDColumn("P_proton");
-    analysisManager->CreateNtupleDColumn("L_e");
-    analysisManager->CreateNtupleDColumn("L_mu");
-    analysisManager->CreateNtupleDColumn("L_pi");
-    analysisManager->CreateNtupleDColumn("L_kaon");
-    analysisManager->CreateNtupleDColumn("L_proton");
-    analysisManager->CreateNtupleDColumn("HitPathLength_fromTrack");
-    analysisManager->CreateNtupleDColumn("expt_e");
-    analysisManager->CreateNtupleDColumn("expt_mu");
-    analysisManager->CreateNtupleDColumn("expt_pi");
-    analysisManager->CreateNtupleDColumn("expt_kaon");
-    analysisManager->CreateNtupleDColumn("expt_proton");
-    analysisManager->CreateNtupleDColumn("prePos_x");
-    analysisManager->CreateNtupleDColumn("prePos_y");
-    analysisManager->CreateNtupleDColumn("prePos_z");
-    analysisManager->CreateNtupleDColumn("postPos_x");
-    analysisManager->CreateNtupleDColumn("postPos_y");
-    analysisManager->CreateNtupleDColumn("postPos_z");
-    analysisManager->CreateNtupleSColumn("processName");
-    analysisManager->CreateNtupleIColumn("EventID");
-    analysisManager->CreateNtupleIColumn("Pt");
-    analysisManager->CreateNtupleIColumn("Pz");
-
-    analysisManager->FinishNtuple();
     analysisManager->CreateNtuple("EventNtuple", "Event signal");
     analysisManager->CreateNtupleDColumn("NumberOfHits");
     analysisManager->CreateNtupleDColumn("Charge");
     analysisManager->CreateNtupleDColumn("TotalLength");
     analysisManager->CreateNtupleDColumn("Dedx");
     analysisManager->CreateNtupleDColumn("MomIn");
-    analysisManager->CreateNtupleDColumn("betagamma");
+    // analysisManager->CreateNtupleDColumn("betagamma");
     analysisManager->FinishNtuple();
+  //
+    if (hitNtuple){
+      analysisManager->CreateNtuple("HitNtuple", "Digitized Signals");
+      analysisManager->CreateNtupleDColumn("charge"); 
+      analysisManager->CreateNtupleDColumn("driftTime_notSmeared"); // drift to the surface of the silicon
+      analysisManager->CreateNtupleDColumn("driftTime_Smeared"); 
+      analysisManager->CreateNtupleDColumn("PixIDX");
+      analysisManager->CreateNtupleDColumn("PixIDY");
+      analysisManager->CreateNtupleDColumn("EnergyDep");
+      analysisManager->CreateNtupleDColumn("StepLength"); 
+      analysisManager->CreateNtupleDColumn("Dedx");
+      analysisManager->CreateNtupleDColumn("MomIn");
+      analysisManager->CreateNtupleDColumn("MassIn");
+      analysisManager->CreateNtupleDColumn("betagamma");
+      analysisManager->CreateNtupleDColumn("layer");
+      analysisManager->CreateNtupleDColumn("Gtime"); // global time
+      analysisManager->CreateNtupleDColumn("Gtime_smeared"); // Gtime + driftTime_Smeared
+      analysisManager->CreateNtupleDColumn("P_e");
+      analysisManager->CreateNtupleDColumn("P_mu");
+      analysisManager->CreateNtupleDColumn("P_pi");
+      analysisManager->CreateNtupleDColumn("P_kaon");
+      analysisManager->CreateNtupleDColumn("P_proton");
+      analysisManager->CreateNtupleDColumn("L_e");
+      analysisManager->CreateNtupleDColumn("L_mu");
+      analysisManager->CreateNtupleDColumn("L_pi");
+      analysisManager->CreateNtupleDColumn("L_kaon");
+      analysisManager->CreateNtupleDColumn("L_proton");
+      analysisManager->CreateNtupleDColumn("HitPathLength_fromTrack");
+      analysisManager->CreateNtupleDColumn("expt_e");
+      analysisManager->CreateNtupleDColumn("expt_mu");
+      analysisManager->CreateNtupleDColumn("expt_pi");
+      analysisManager->CreateNtupleDColumn("expt_kaon");
+      analysisManager->CreateNtupleDColumn("expt_proton");
+      analysisManager->CreateNtupleDColumn("prePos_x");
+      analysisManager->CreateNtupleDColumn("prePos_y");
+      analysisManager->CreateNtupleDColumn("prePos_z");
+      analysisManager->CreateNtupleDColumn("postPos_x");
+      analysisManager->CreateNtupleDColumn("postPos_y");
+      analysisManager->CreateNtupleDColumn("postPos_z");
+      analysisManager->CreateNtupleSColumn("processName");
+      analysisManager->CreateNtupleIColumn("EventID");
+      analysisManager->CreateNtupleIColumn("Pt");
+      analysisManager->CreateNtupleIColumn("Pz");
+
+      analysisManager->FinishNtuple();
+    }
+
   //
 }
 

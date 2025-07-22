@@ -85,6 +85,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 
     G4bool fCheckOverlaps = true;  // option to activate checking of volumes overlaps
     G4LogicalVolume* fTPCLogic = nullptr;
+    G4LogicalVolume* fsliceLV = nullptr;
 };
 
 // inline functions
