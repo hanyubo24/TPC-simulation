@@ -13,7 +13,7 @@ public:
   void Digitize() override;
 
 private:
-  G4double ePairEnergy = 160 * eV;   // e-h pair creation energy
+  G4double ePairEnergy = 26 * eV;   // mean energy to produce e-h pair 
   G4double driftVelocity = 1.0e6 * cm/s; 
   G4double diffusionCons = 35. *cm2/s;
   //G4double timeSmearing = 30 * ps;  // electronics resolution
