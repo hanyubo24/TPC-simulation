@@ -1,0 +1,10 @@
+filename: "../build/TPC_pi.root"
+treename: "HitNtuple"
+output_h5: "test.h5"
+pixel_size_xy: 5
+voxel_size_z: 0.1
+smear_sigma: 2
+radius: 500
+length_z: 1000
+submap_size_xy: 100
+events_per_group: 4
