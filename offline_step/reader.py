@@ -71,8 +71,18 @@ def save_sparse_h5_submap(h5file, event_tag, xID, yID, coords, counts, shape):
 def convert_root_to_sparse_h5(filename, treename, output_h5="test.h5",
                               pixel_size_xy=5, voxel_size_z=0.1,
                               smear_sigma=0.0, radius=500, length_z=1000,
-                              submap_size_xy=100, events_per_group=1):
-
+                              submap_size_xy=100, events_per_group=4):
+    
+    """
+    Parameters:
+    - pixel_size_xy : bin size in x and y (mm)
+    - voxel_size_z : bin size in z (mm)
+    - smear_sigma : smear sigma in x,y,z (mm)
+    - radius: radius of the TPC, hits outside the radius will be masked 
+    - length_z: length of the TPC
+    - submap_size_xy: size of the subhitmap (mm) 
+    - events_per_group: how many events in this (sub)hitmap
+    """
     tree = uproot.open(filename)[treename]
     df = tree.arrays(library="pd")
 
@@ -130,35 +140,43 @@ def convert_root_to_sparse_h5(filename, treename, output_h5="test.h5",
 
 
 # load the h5 sample 
-def load_sparse_event(h5file_path, event_id):
-    with h5py.File(h5file_path, 'r') as f:
-        group = f[str(event_id)]
-        coords = group["coords"][:]
-        counts = group["counts"][:]
-        shape = tuple(group["shape"][:])
-    return coords, counts, shape
 
+
+def load_sparse_event(file_path, event_key):
+    with h5py.File(file_path, 'r') as f:
+      
+        grp = f[str(event_key)]
+        coords = grp["coords"][:]
+        counts = grp["counts"][:]
+        shape = tuple(grp["shape"][:])
+    return coords, counts, shape
 
 def build_dense_hitmap(coords, counts, shape):
     hitmap = np.zeros(shape, dtype=np.float32)
-    for (x, y, z), value in zip(coords, counts):
-        hitmap[int(x), int(y), int(z)] = value
+    for i in range(len(coords)):
+        x, y, z = coords[i]
+        hitmap[int(x), int(y), int(z)] += counts[i]
     return hitmap
 
-def plot_projection(hitmap, axis='z'):
+def plot_projection(hitmap, axis='z', cmap='viridis'):
     if axis == 'z':
-        proj = np.sum(hitmap, axis=2)  # X-Y projection
+        proj = np.sum(hitmap, axis=2)
+        xlabel, ylabel = 'X', 'Y'
     elif axis == 'x':
-        proj = np.sum(hitmap, axis=0)  # Y-Z projection
+        proj = np.sum(hitmap, axis=0)
+        xlabel, ylabel = 'Y', 'Z'
     elif axis == 'y':
-        proj = np.sum(hitmap, axis=1)  # X-Z projection
+        proj = np.sum(hitmap, axis=1)
+        xlabel, ylabel = 'X', 'Z'
     else:
-        raise ValueError("Axis must be 'x', 'y', or 'z'.")
+        raise ValueError("Axis must be one of 'x', 'y', 'z'.")
 
-    plt.imshow(proj.T, origin='lower', cmap='viridis', aspect='auto')
-    plt.title(f"Projection on {axis.upper()} axis")
-    plt.colorbar(label="Hit Count")
-    plt.xlabel("Pixel")
-    plt.ylabel("Pixel")
+    plt.figure(figsize=(6,5))
+    plt.imshow(proj.T, origin='lower', cmap=cmap, aspect='auto')
+    plt.colorbar(label='Hit counts')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(f'{axis.upper()} projection of hitmap')
     plt.show()
+
 
