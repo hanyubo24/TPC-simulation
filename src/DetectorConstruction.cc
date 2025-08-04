@@ -121,8 +121,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
 
  // a cylinder 
-  G4double radius_for_testing = 0.5*m;
-  G4double size_z = 0.5*m; // full z = *2
+  //G4double radius_for_testing = 0.5*m;
+  //G4double size_z = 0.5*m; // full z = *2
+  G4double radius_for_testing = 5*cm;
+  G4double size_z = 5*cm; // full z = *2
   G4int numSlices = 10; // 
   G4double sliceZHalf = size_z / numSlices;
 

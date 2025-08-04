@@ -76,10 +76,10 @@ int main(int argc, char** argv)
   G4double pMin = 1 *MeV;
   G4double pMax = 100 *MeV;
   //G4String particleName = "kaon-";
-  G4String particleName = "pi-";
-  //G4String particleName = "gamma";
+  //G4String particleName = "pi-";
+  G4String particleName = "gamma";
   G4bool show_gui = false; 
-  G4String outFileName = "TPC_pi.root"; 
+  G4String outFileName = "TPC.root"; 
   G4String inFileName = ""; 
   G4int nEvent = 1;
   //G4double gunZPos = -2.0 * cm; 
