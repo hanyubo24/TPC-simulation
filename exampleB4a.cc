@@ -73,8 +73,8 @@ int main(int argc, char** argv)
   G4bool verboseBestUnits = true;
 #ifdef G4MULTITHREADED
   G4int nThreads = 0;
-  G4double pMin = 1 *MeV;
-  G4double pMax = 100 *MeV;
+  G4double pMin = 0.002 *MeV;
+  G4double pMax = 0.1 *MeV;
   //G4String particleName = "kaon-";
   //G4String particleName = "pi-";
   G4String particleName = "gamma";
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
   G4String inFileName = ""; 
   G4int nEvent = 1;
   //G4double gunZPos = -2.0 * cm; 
-  G4double gunZPos = 0 * m; 
+  G4double gunZPos = -5 * cm; 
 #endif
   for (G4int i = 1; i < argc; i = i + 2) {
     if (G4String(argv[i]) == "-m")

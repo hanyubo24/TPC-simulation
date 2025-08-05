@@ -29,6 +29,7 @@
 
 #include "DetectorConstruction.hh"
 #include "TPCSensitiveDetector.hh"
+#include "TPCField.hh"
 #include "G4AutoDelete.hh"
 #include "G4Box.hh"
 #include "G4Tubs.hh"
@@ -45,6 +46,12 @@
 #include "G4SDManager.hh"
 #include "G4UserLimits.hh"
 #include "G4ProductionCuts.hh"
+#include "G4FieldManager.hh"
+#include "G4EqMagElectricField.hh"
+#include "G4ClassicalRK4.hh"
+#include "G4ChordFinder.hh"
+#include "G4TransportationManager.hh"
+#include "G4MagIntegratorDriver.hh"
 namespace B4
 {
 
@@ -160,15 +167,26 @@ void DetectorConstruction::ConstructSDandField()
   // Create global magnetic field messenger.
   // Uniform magnetic field is then created automatically if
   // the field value is not zero.
-  //G4ThreeVector fieldValue = G4ThreeVector(0., 1.5*tesla, 0.);
-  G4ThreeVector fieldValue = G4ThreeVector(0., 0., 1.5*tesla);
+  G4ThreeVector eFieldVec = G4ThreeVector(0.0, 0.0, -1.0 * kilovolt/cm);
+  G4ThreeVector bFieldVec = G4ThreeVector(0.0, 0.0, 1.5 * tesla);
+  auto myField = new TPCField(eFieldVec, bFieldVec);
 
-  //G4ThreeVector fieldValue = G4ThreeVector(0., 0., 0.);
-  fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
-  fMagFieldMessenger->SetVerboseLevel(1);
+  auto equation = new G4EqMagElectricField(myField);
+  auto stepper = new G4ClassicalRK4(equation, 8);
+  // Create an integration driver
+  auto integrationDriver = new G4MagIntegratorDriver(
+      1e-3 * mm, stepper, stepper->GetNumberOfVariables()
+  );
+
+  // Now use the proper constructor:
+  auto chordFinder = new G4ChordFinder(integrationDriver);
+
+  auto fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+  fieldManager->SetDetectorField(myField);
+  fieldManager->SetChordFinder(chordFinder);
 
   // Register the field messenger for deleting
-  G4AutoDelete::Register(fMagFieldMessenger);
+  //G4AutoDelete::Register(fMagFieldMessenger);
 
   G4SDManager* sdManager = G4SDManager::GetSDMpointer();
   auto* TPCSD = new TPCSensitiveDetector("TPCSD");
