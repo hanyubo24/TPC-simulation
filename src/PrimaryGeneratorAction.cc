@@ -157,7 +157,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     G4ThreeVector dir(Mdx, Mdy, Mdz);
     dir = dir.unit(); 
 
-    fParticleGun->SetParticleMomentum(p);
+    fParticleGun->SetParticleEnergy(p);
     fParticleGun->SetParticleMomentumDirection(dir);
 
     fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., fgunZ));

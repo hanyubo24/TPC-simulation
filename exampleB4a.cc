@@ -74,8 +74,8 @@ int main(int argc, char** argv)
   G4bool verboseBestUnits = true;
 #ifdef G4MULTITHREADED
   G4int nThreads = 0;
-  G4double pMin = 45 *MeV;
-  G4double pMax = 45*MeV;
+  G4double pMin = 45.0*MeV;
+  G4double pMax = 45.0*MeV;
   G4double blockW = 0.2;//*cm
   //G4String particleName = "kaon-";
   //G4String particleName = "pi-";
