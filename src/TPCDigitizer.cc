@@ -124,7 +124,7 @@ void TPCDigitizer::Digitize() {
     digiCollection->insert(digi);
   }
    auto* analysisManager = G4AnalysisManager::Instance();
-   auto dedx_event = edep_event/length_event;   
+   auto dedx_event = edep_event;   
    auto betagamma_event =  MomIn_event / massInParticle_event;
 
    analysisManager->FillNtupleDColumn(0, 0, hitsCol->entries());

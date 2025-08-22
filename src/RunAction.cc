@@ -76,7 +76,7 @@ RunAction::RunAction(const G4String& outFileName)
     analysisManager->CreateNtupleDColumn("NumberOfHits");
     analysisManager->CreateNtupleDColumn("Charge");
     analysisManager->CreateNtupleDColumn("TotalLength");
-    analysisManager->CreateNtupleDColumn("Dedx");
+    analysisManager->CreateNtupleDColumn("EnergyDep");
     analysisManager->CreateNtupleDColumn("MomIn");
     
     analysisManager->FinishNtuple();

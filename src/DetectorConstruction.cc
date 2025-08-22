@@ -72,6 +72,15 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+void DetectorConstruction::SetBlockerWidth(G4double w){
+    fB_w = w; 
+}
+ 
+void DetectorConstruction::SetBlockerMaterial(G4String m){
+
+    fBlockerMaterialName = m;
+}
+
 void DetectorConstruction::DefineMaterials()
 {
   // Lead material defined using NIST Manager
@@ -81,15 +90,26 @@ void DetectorConstruction::DefineMaterials()
   nist->FindOrBuildMaterial("G4_Galactic");
   auto Ar  = nist->FindOrBuildElement("Ar"); 
   auto CO2 = nist->FindOrBuildMaterial("G4_CARBON_DIOXIDE");
+  auto He     = nist->FindOrBuildMaterial("G4_He");       // helium (gas)
+  auto C2H6   = nist->FindOrBuildMaterial("G4_ETHANE");   // ethane
+  //nist->FindOrBuildMaterial("G4_U");       // natural uranium
+  //nist->FindOrBuildMaterial("G4_lXe");     // liquid xenon
+  //nist->FindOrBuildMaterial("G4_Xe");      // xenon gas
+  //nist->FindOrBuildMaterial("G4_Ta");      // tantalum
+  nist->FindOrBuildMaterial("G4_Au");      // gold
+  nist->FindOrBuildMaterial("G4_Al");      // aluminum
+  nist->FindOrBuildMaterial("G4_STAINLESS-STEEL");      // STEEL
+  nist->FindOrBuildMaterial("G4_Pb");      // lead
+  nist->FindOrBuildMaterial("G4_W");       // tungsten
 
   // Define Argon/CO₂ TPC gas mixture (e.g., 80/20 at 1 atm)
   G4double temperature = 293.15 * kelvin;
   G4double pressure    = 1. * atmosphere;
-  G4double density     = 1.6e-3 * g/cm3; // Approximate
+  G4double density     =  7.08e-4 * g/cm3; // Approximate
 
   auto TPCGas = new G4Material("TPCGas", density, 2, kStateGas, temperature, pressure);
-  TPCGas->AddElement(Ar, 80 * perCent);
-  TPCGas->AddMaterial(CO2, 20 * perCent);
+  TPCGas->AddMaterial(He, 50 * perCent);
+  TPCGas->AddMaterial(C2H6, 50 * perCent);
 
 }
 
@@ -106,6 +126,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto air = G4Material::GetMaterial("G4_AIR");
   auto vacuum = G4Material::GetMaterial("G4_Galactic");
   auto tpcGas = G4Material::GetMaterial("TPCGas");
+  auto block_mat = G4Material::GetMaterial(fBlockerMaterialName);
   //
   // World
   //
@@ -130,33 +151,31 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
  // a cylinder 
   //G4double radius_for_testing = 0.5*m;
   //G4double size_z = 0.5*m; // full z = *2
-  G4double radius_for_testing = 5*cm;
+  G4double radius_for_testing = 0.5*cm;
   G4double size_z = 5*cm; // full z = *2
-  G4int numSlices = 10; // 
-  G4double sliceZHalf = size_z / numSlices;
 
   // 1. Full TPC volume (mother)
 
   auto gasDet = new G4Tubs("TPC", 0, radius_for_testing, size_z, 0.0*deg, 360.0*deg);
   auto gasLV = new G4LogicalVolume(gasDet, tpcGas, "TPC");  
 
-  // 2. Slice volume (1/N of TPC in Z)
-  auto sliceGas = new G4Tubs("TPCSlice", 0, radius_for_testing, sliceZHalf, 0.0*deg, 360.0*deg);
-  fsliceLV = new G4LogicalVolume(sliceGas, tpcGas, "TPCSlice"); 
-
-  // 3. Replicate slices along Z
-  new G4PVReplica("TPCSlicePhys", fsliceLV, gasLV, kZAxis, numSlices, 2*sliceZHalf);
-
-  // 4. Place full TPC in the world
+  // 2. Place full TPC in the world
   fTPCLogic = gasLV; 
-  TPCPV = new G4PVPlacement(0, G4ThreeVector(0,0,0), gasLV, "TPC", worldLV, false, 0, fCheckOverlaps);
+  TPCPV = new G4PVPlacement(0, G4ThreeVector(0,0,size_z), gasLV, "TPC", worldLV, false, 0, fCheckOverlaps);
+
+  // 3. add a blocker before 
+  G4double radius_blocker = 5*cm;
+  G4double size_z_blocker = fB_w*0.5*cm; 
+  auto block = new G4Tubs("Block", 0, radius_blocker, size_z_blocker, 0.0*deg, 360.0*deg);
+  auto blockLV = new G4LogicalVolume(block, block_mat, "Block");  
+  auto blockPV = new G4PVPlacement(nullptr, G4ThreeVector(0,0,-fB_w*cm),blockLV, "Block", worldLV, false, 0, fCheckOverlaps); 
 
   // Visualization attributes
   worldLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 
   //worldLV->SetVisAttributes(G4VisAttributes(G4Colour::White()));
   fTPCLogic->SetVisAttributes(G4VisAttributes(G4Colour::Yellow()));
-
+  blockLV ->SetVisAttributes(G4VisAttributes(G4Colour::White()));
   return worldPV;
 }
 
@@ -167,23 +186,23 @@ void DetectorConstruction::ConstructSDandField()
   // Create global magnetic field messenger.
   // Uniform magnetic field is then created automatically if
   // the field value is not zero.
-  G4ThreeVector eFieldVec = G4ThreeVector(0.0, 0.0, -1.0 * kilovolt/cm);
-  G4ThreeVector bFieldVec = G4ThreeVector(0.0, 0.0, 1.5 * tesla);
-  auto myField = new TPCField(eFieldVec, bFieldVec);
+  //G4ThreeVector eFieldVec = G4ThreeVector(0.0, 0.0, -1.0 * kilovolt/cm);
+  //G4ThreeVector bFieldVec = G4ThreeVector(0.0, 0.0, 1.5 * tesla);
+  //auto myField = new TPCField(eFieldVec, bFieldVec);
 
-  auto equation = new G4EqMagElectricField(myField);
-  auto stepper = new G4ClassicalRK4(equation, 8);
+ // auto equation = new G4EqMagElectricField(myField);
+ // auto stepper = new G4ClassicalRK4(equation, 8);
   // Create an integration driver
-  auto integrationDriver = new G4MagIntegratorDriver(
-      1e-3 * mm, stepper, stepper->GetNumberOfVariables()
-  );
+ // auto integrationDriver = new G4MagIntegratorDriver(
+ //     1e-3 * mm, stepper, stepper->GetNumberOfVariables()
+ // );
 
-  // Now use the proper constructor:
-  auto chordFinder = new G4ChordFinder(integrationDriver);
+ // // Now use the proper constructor:
+ // auto chordFinder = new G4ChordFinder(integrationDriver);
 
-  auto fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  fieldManager->SetDetectorField(myField);
-  fieldManager->SetChordFinder(chordFinder);
+  //auto fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+  //fieldManager->SetDetectorField(myField);
+  //fieldManager->SetChordFinder(chordFinder);
 
   // Register the field messenger for deleting
   //G4AutoDelete::Register(fMagFieldMessenger);
@@ -197,12 +216,12 @@ void DetectorConstruction::ConstructSDandField()
   fTPCLogic->SetRegion(regionTPC);
   regionTPC->AddRootLogicalVolume(fTPCLogic);
   
-  auto cuts = new G4ProductionCuts();
-  cuts->SetProductionCut(0.1*micrometer, "e-");
-  cuts->SetProductionCut(0.1*micrometer, "e+");
-  cuts->SetProductionCut(0.1*micrometer, "gamma");
+  //auto cuts = new G4ProductionCuts();
+  //cuts->SetProductionCut(0.1*micrometer, "e-");
+  //cuts->SetProductionCut(0.1*micrometer, "e+");
+  //cuts->SetProductionCut(0.1*micrometer, "gamma");
   
-  regionTPC->SetProductionCuts(cuts);
+  //regionTPC->SetProductionCuts(cuts);
 
 }
 

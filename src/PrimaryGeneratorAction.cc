@@ -84,6 +84,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   G4double Mdx = G4UniformRand()-0.5; 
   G4double Mdy = G4UniformRand()-0.5;
   G4double Mdz = G4UniformRand()+0.5;
+  Mdx = 0;
+  Mdy = 0;
+  Mdz = 1.0;
   //G4double Mdz =0.0; 
   double cth, phi, p0, theta;
   G4double p;
@@ -157,8 +160,8 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     fParticleGun->SetParticleMomentum(p);
     fParticleGun->SetParticleMomentumDirection(dir);
 
-    //fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., fgunZ));
-    fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., 0.));
+    fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., fgunZ));
+    //fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., 0.));
     fParticleGun->GeneratePrimaryVertex(event);
 
   // Set gun position

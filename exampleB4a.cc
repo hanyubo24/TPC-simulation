@@ -53,6 +53,7 @@ void PrintUsage()
   G4cerr << " ./TPC [-m macro ] [-u UIsession] [-t nThreads] [-vDefault]" << G4endl;
   G4cerr << "        -p e- -pmin 80 -pmax 80 -o myOutput.root -z -14.0" << G4endl;
   G4cerr << "        -csv xxx.csv -o myOutput.root -z -14.0" << G4endl;
+  G4cerr << "        -bw 0.1 -bm [G4_W, G4_STAINLESS-STEEL, G4_Al]" << G4endl;
   G4cerr << "        -ui: turnning on the ui" << G4endl;
 }
 }  // namespace
@@ -73,17 +74,19 @@ int main(int argc, char** argv)
   G4bool verboseBestUnits = true;
 #ifdef G4MULTITHREADED
   G4int nThreads = 0;
-  G4double pMin = 0.002 *MeV;
-  G4double pMax = 0.1 *MeV;
+  G4double pMin = 45 *MeV;
+  G4double pMax = 45*MeV;
+  G4double blockW = 0.2;//*cm
   //G4String particleName = "kaon-";
   //G4String particleName = "pi-";
-  G4String particleName = "gamma";
+  G4String particleName = "e-";
+  G4String blockMat = "G4_W"; //G4_W, G4_STAINLESS-STEEL, G4_Al
   G4bool show_gui = false; 
-  G4String outFileName = "TPC.root"; 
+  G4String outFileName = "smallTPC.root"; 
   G4String inFileName = ""; 
   G4int nEvent = 1;
   //G4double gunZPos = -2.0 * cm; 
-  G4double gunZPos = -5 * cm; 
+  G4double gunZPos = -15 * cm; 
 #endif
   for (G4int i = 1; i < argc; i = i + 2) {
     if (G4String(argv[i]) == "-m")
@@ -92,6 +95,10 @@ int main(int argc, char** argv)
       nEvent = G4UIcommand::ConvertToInt(argv[i + 1]);
     else if (G4String(argv[i]) == "-u")
       session = argv[i + 1];
+    else if (G4String(argv[i]) == "-bw")
+      blockW = std::stod(argv[i + 1]);
+    else if (G4String(argv[i]) == "-bm")
+      blockMat = argv[i + 1];
     else if (G4String(argv[i]) == "-z")
       gunZPos = std::stod(argv[i + 1]) * CLHEP::cm;
     else if (G4String(argv[i]) == "-p")
@@ -150,6 +157,8 @@ int main(int argc, char** argv)
   //
   auto detConstruction = new B4::DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
+  detConstruction-> SetBlockerMaterial(blockMat);
+  detConstruction-> SetBlockerWidth(blockW);
 
   auto physicsList = new FTFP_BERT; // QGSP_BERT // YB: to be tested
   physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());

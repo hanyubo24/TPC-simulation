@@ -68,6 +68,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     // get methods
     //
     const G4VPhysicalVolume* GetTPCPV() const;
+    void SetBlockerMaterial(G4String m);
+    void SetBlockerWidth(G4double w);
 
   private:
     // methods
@@ -78,6 +80,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     // data members
     //
     static G4ThreadLocal G4GlobalMagFieldMessenger* fMagFieldMessenger;
+    G4double fB_w = 0.2;
+    G4String fBlockerMaterialName = "G4_Al";
     // magnetic field messenger
 
     G4VPhysicalVolume* TPCPV = nullptr;  // the absorber physical volume
@@ -85,7 +89,6 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 
     G4bool fCheckOverlaps = true;  // option to activate checking of volumes overlaps
     G4LogicalVolume* fTPCLogic = nullptr;
-    G4LogicalVolume* fsliceLV = nullptr;
 };
 
 // inline functions

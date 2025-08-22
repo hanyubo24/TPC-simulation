@@ -55,17 +55,13 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   // Collect energy and track length step by step
 
   // get volume of the current step
-  //auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
-  // auto volume_pre = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
+  auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
+  auto volume_pre = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
   G4Track* track = step->GetTrack();
   auto cPoint = step->GetPostStepPoint();
   auto pPoint = step->GetPreStepPoint();
 
-  G4String preName = "";
-  if (pPoint && pPoint->GetPhysicalVolume()) {
-      preName = pPoint->GetPhysicalVolume()->GetName();
-  }
-  if (preName == "TPCSlicePhys") {
+  if (volume == fDetConstruction->GetTPCPV()) {
 
       // printing out something 
       G4ThreeVector postStepPos = cPoint->GetPosition();
