@@ -107,9 +107,25 @@ void DetectorConstruction::DefineMaterials()
   G4double pressure    = 1. * atmosphere;
   G4double density     =  7.08e-4 * g/cm3; // Approximate
 
-  auto TPCGas = new G4Material("TPCGas", density, 2, kStateGas, temperature, pressure);
-  TPCGas->AddMaterial(He, 50 * perCent);
-  TPCGas->AddMaterial(C2H6, 50 * perCent);
+  G4double M_He   = 4.0026*g/mole;   // molar mass of He
+  G4double M_C2H6 = 30.07*g/mole;    // molar mass of ethane
+  
+     // 50% : 50% by volume → molar ratio 1 : 1
+   G4double mass_He   = M_He;
+   G4double mass_C2H6 = M_C2H6;
+   G4double mass_sum  = mass_He + mass_C2H6;
+   
+   G4double w_He   = mass_He   / mass_sum;   // mass fraction of He
+   G4double w_C2H6 = mass_C2H6 / mass_sum;   // mass fraction of ethane
+   
+   // --- Build material ---
+   G4Material* TPCGas = new G4Material("TPCGas", density, 2,
+                                       kStateGas, temperature, pressure);
+   
+   TPCGas->AddMaterial(He,   w_He);
+   TPCGas->AddMaterial(C2H6, w_C2H6);
+
+
 
 }
 
