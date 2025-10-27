@@ -1,0 +1,123 @@
+Backend: Vitis
+ClockPeriod: 5
+ClockUncertainty: 27%
+HLSConfig:
+  LayerName:
+    fc1:
+      Precision:
+        accum: auto
+        bias: fixed<6,1,TRN,WRAP,0>
+        result: auto
+        weight: fixed<6,1,TRN,WRAP,0>
+      ReuseFactor: 1
+      Trace: false
+    fc1_input:
+      Precision:
+        result: auto
+      Trace: false
+    fc1_linear:
+      Precision:
+        result: auto
+        table: fixed<18,8,TRN,WRAP,0>
+      ReuseFactor: 1
+      TableSize: 1024
+      Trace: false
+    fc2:
+      Precision:
+        accum: auto
+        bias: fixed<6,1,TRN,WRAP,0>
+        result: auto
+        weight: fixed<6,1,TRN,WRAP,0>
+      ReuseFactor: 1
+      Trace: false
+    fc2_linear:
+      Precision:
+        result: auto
+        table: fixed<18,8,TRN,WRAP,0>
+      ReuseFactor: 1
+      TableSize: 1024
+      Trace: false
+    fc3:
+      Precision:
+        accum: auto
+        bias: fixed<6,1,TRN,WRAP,0>
+        result: auto
+        weight: fixed<6,1,TRN,WRAP,0>
+      ReuseFactor: 1
+      Trace: false
+    fc3_linear:
+      Precision:
+        result: auto
+        table: fixed<18,8,TRN,WRAP,0>
+      ReuseFactor: 1
+      TableSize: 1024
+      Trace: false
+    output:
+      Precision:
+        accum: auto
+        bias: fixed<6,1,TRN,WRAP,0>
+        result: auto
+        weight: fixed<6,1,TRN,WRAP,0>
+      ReuseFactor: 1
+      Trace: false
+    output_linear:
+      Precision:
+        result: auto
+        table: fixed<18,8,TRN,WRAP,0>
+      ReuseFactor: 1
+      TableSize: 1024
+      Trace: false
+    relu1:
+      Precision:
+        result: ufixed<6,0,RND_CONV,SAT,0>
+        table: fixed<18,8,TRN,WRAP,0>
+      ReuseFactor: 1
+      TableSize: 1024
+      Trace: false
+    relu2:
+      Precision:
+        result: ufixed<6,0,RND_CONV,SAT,0>
+        table: fixed<18,8,TRN,WRAP,0>
+      ReuseFactor: 1
+      TableSize: 1024
+      Trace: false
+    relu3:
+      Precision:
+        result: ufixed<6,0,RND_CONV,SAT,0>
+        table: fixed<18,8,TRN,WRAP,0>
+      ReuseFactor: 1
+      TableSize: 1024
+      Trace: false
+    softmax:
+      Implementation: stable
+      Precision:
+        exp_table: fixed<18,8,RND,SAT,0>
+        inv_table: fixed<18,8,RND,SAT,0>
+        result: auto
+        table: fixed<18,8,TRN,WRAP,0>
+      ReuseFactor: 1
+      Skip: false
+      TableSize: 1024
+      Trace: false
+      exp_table_t: ap_fixed<18,8>
+      inv_table_t: ap_fixed<18,4>
+  Model:
+    BramFactor: 1000000000
+    Precision:
+      default: fixed<16,6>
+    ReuseFactor: 1
+    Strategy: Latency
+    TraceOutput: false
+IOType: io_parallel
+InputData: null
+KerasModel: !keras_model 'model_3/hls4ml_prj/keras_model.keras'
+OutputDir: model_3/hls4ml_prj
+OutputPredictions: null
+Part: xc7a200tsbg484-1
+ProjectName: myproject
+Stamp: 7b5935e4
+Version: 1.0.0
+WriterConfig:
+  Namespace: null
+  WriteTar: false
+  WriteWeightsTxt: true

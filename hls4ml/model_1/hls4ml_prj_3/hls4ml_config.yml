@@ -1,0 +1,24 @@
+Backend: Vitis
+ClockPeriod: 5
+ClockUncertainty: 27%
+HLSConfig:
+  Model:
+    BramFactor: 1000000000
+    Precision:
+      default: fixed<16,6>
+    ReuseFactor: 2
+    Strategy: Latency
+    TraceOutput: false
+IOType: io_parallel
+InputData: null
+KerasModel: !keras_model 'model_1/hls4ml_prj_3/keras_model.keras'
+OutputDir: model_1/hls4ml_prj_3
+OutputPredictions: null
+Part: xc7a200tsbg484-1
+ProjectName: myproject
+Stamp: 3e43dcfc
+Version: 1.0.0
+WriterConfig:
+  Namespace: null
+  WriteTar: false
+  WriteWeightsTxt: true
