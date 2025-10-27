@@ -41,7 +41,9 @@
 #include "G4VisExecutive.hh"
 #include "G4DigiManager.hh"
 #include "TPCDigitizer.hh"
-// #include "Randomize.hh"
+#include "Randomize.hh"
+#include <ctime>
+#include <unistd.h>
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -145,6 +147,10 @@ int main(int argc, char** argv)
     runManager->SetNumberOfThreads(nThreads);
   }
 #endif
+
+  G4long seed = time(nullptr) + getpid();
+  CLHEP::HepRandom::setTheSeed(seed);
+  G4cout << ">>>>>>>>>>>>>   Random seed set to: " << seed << G4endl;
 
   // Set mandatory initialization classes
   //

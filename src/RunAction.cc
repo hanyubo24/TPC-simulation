@@ -53,8 +53,8 @@ RunAction::RunAction(const G4String& outFileName)
     auto* analysisManager = G4AnalysisManager::Instance();
 
     G4int numSlices = 10;
-    G4int bins_x = 100;
-    G4int bins_y = 100;
+    G4int bins_x = 200;
+    G4int bins_y = 200;
     G4bool hitNtuple = true;
     for (G4int i = 0; i < numSlices; ++i) {
         std::ostringstream name, title;
@@ -62,14 +62,14 @@ RunAction::RunAction(const G4String& outFileName)
         title << "HitMap for slice #" << i << ";X (mm);Y (mm)";
 
         analysisManager->CreateH2(name.str(), title.str(), 
-                                  bins_x, -500., 500.,   // X binning
-                                  bins_y, -500.,  500.);   // Y binning
+                                  bins_x, -50., 50.,   // X binning
+                                  bins_y, -50.,  50.);   // Y binning
     }
 
     //analysisManager->SetVerboseLevel(1);
     //analysisManager->SetNtupleMerging(true);
     // index = 10
-    analysisManager->CreateH2("HitMap_all", "HitMap;X (mm);Y (mm)", bins_x, -500., 500.,bins_y, -500., 500.);
+    analysisManager->CreateH2("HitMap_all", "HitMap;X (mm);Y (mm)", bins_x, -50., 50.,bins_y, -50., 50.);
 
     G4cout << "[THREAD] Creating ntuple..." << G4endl;
     analysisManager->CreateNtuple("EventNtuple", "Event signal");

@@ -7,7 +7,7 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 
 # length unit = mm
-def build_hitmap(df, pixel_size_xy=5, voxel_size_z=0.1, smear_sigma=0.0, radius=500, length_z=1000):
+def build_hitmap(df, pixel_size_xy=5, voxel_size_z=0.1, smear_sigma=0.0, radius=50, length_z=100):
     """
     Build a cylindrical 3D voxel map from hit positions in a TPC.
 
@@ -69,8 +69,8 @@ def save_sparse_h5_submap(h5file, event_tag, xID, yID, coords, counts, shape):
 
 
 def convert_root_to_sparse_h5(filename, treename, output_h5="test.h5",
-                              pixel_size_xy=5, voxel_size_z=0.1,
-                              smear_sigma=0.0, radius=500, length_z=1000,
+                              pixel_size_xy=0.1, voxel_size_z=100,
+                              smear_sigma=0.0, radius=50, length_z=100,
                               submap_size_xy=100, events_per_group=4):
     
     """

@@ -83,7 +83,13 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   // reading from a file
   G4double Mdx = G4UniformRand()-0.5; 
   G4double Mdy = G4UniformRand()-0.5;
-  G4double Mdz = G4UniformRand()+0.5;
+  G4double Mdz = G4UniformRand()-0.5;
+
+  G4double Pos_r = G4UniformRand()*50*mm; 
+  G4double Pos_phi =  G4UniformRand() * 2.0 * CLHEP::pi;
+  G4double Pos_z = (G4UniformRand()-0.5)*100*mm;
+  G4double Pos_x = Pos_r*std::cos(Pos_phi);
+  G4double Pos_y = Pos_r*std::sin(Pos_phi);
   //G4double Mdz =0.0; 
   double cth, phi, p0, theta;
   G4double p;
@@ -158,7 +164,13 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     fParticleGun->SetParticleMomentumDirection(dir);
 
     //fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., fgunZ));
-    fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., 0.));
+    //fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., 0.));
+
+    if (p>10*MeV){
+        fParticleGun->SetParticlePosition(G4ThreeVector(0, 0, 0));
+    } else{ 
+    fParticleGun->SetParticlePosition(G4ThreeVector(Pos_x, Pos_y, Pos_z));
+    }
     fParticleGun->GeneratePrimaryVertex(event);
 
   // Set gun position
